@@ -345,7 +345,7 @@ def compute() -> dict:
 
     print("Downloading market data...")
     raw = yf.download(
-        tickers=ASSETS, start="2005-12-31",
+        tickers=ASSETS, start="2002-12-31",
         end=datetime.now().strftime("%Y-%m-%d"),
         auto_adjust=True, progress=False,
     )
@@ -364,7 +364,7 @@ def compute() -> dict:
 
     market_regime = (
         Close["SPY"].div(Close["SPY"].rolling(200).mean()) - 1
-    ).loc["2011":]
+    ).loc["2004":]
     market_regime = market_regime.where(market_regime >= 0, 0).where(market_regime <= 0, 1)
 
     print("Running strategy...")
@@ -378,7 +378,7 @@ def compute() -> dict:
         weighting="ATR",
         rebalance="W",
         initial_cash=100_000_000.0,
-        StartingYear="2011",
+        StartingYear="2004",
         safe_asset="SHY",
         M=3,
         S=0.15,
@@ -432,7 +432,7 @@ def compute() -> dict:
     return {
         "computed_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "config": {
-            "start_date":     "2011-01-01",
+            "start_date":     "2004-01-01",
             "end_date":       datetime.now().strftime("%Y-%m-%d"),
             "initial_capital": 100_000_000.0,
             "n_assets":       len(Close.columns),
