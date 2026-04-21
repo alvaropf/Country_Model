@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "functions": {
+    "api/strategy.py": {
+      "maxDuration": 60,
+      "includeFiles": "api/_lib/**"
+    }
+  }
+}
