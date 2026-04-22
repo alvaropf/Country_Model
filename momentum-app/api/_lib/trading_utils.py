@@ -36,7 +36,7 @@ def RSI_function(Close, period=14):
 
 
 # ── ATR ────────────────────────────────────────────────────────────────────────
-def calculate_atr(High, Low, Close, period=21):
+def calculate_atr(High, Low, Close, period=50):
     """Calculate ATR for each column independently."""
     atr_dict = {}
     for col in Close.columns:
