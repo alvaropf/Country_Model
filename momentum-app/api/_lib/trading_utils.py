@@ -36,27 +36,19 @@ def RSI_function(Close, period=14):
 
 # ── ATR ────────────────────────────────────────────────────────────────────────
 def calculate_atr(High, Low, Close, period=21):
-    hl  = High - Low
-    hc  = (High - Close.shift(1)).abs()
-    lc  = (Low  - Close.shift(1)).abs()
-    tr  = pd.concat([hl, hc, lc], axis=1).max(axis=1) if isinstance(Close, pd.Series) \
-          else pd.DataFrame({
-              "hl": (High - Low).values.flatten(),
-              "hc": (High - Close.shift(1)).abs().values.flatten(),
-              "lc": (Low  - Close.shift(1)).abs().values.flatten(),
-          }, index=High.index).max(axis=1)
-    # For DataFrame inputs (multiple assets), compute ATR per column
-    if isinstance(Close, pd.DataFrame):
-        atr_dict = {}
-        for col in Close.columns:
-            tr_col = pd.concat([
-                (High[col] - Low[col]).rename("hl"),
-                (High[col] - Close[col].shift(1)).abs().rename("hc"),
-                (Low[col]  - Close[col].shift(1)).abs().rename("lc"),
-            ], axis=1).max(axis=1)
-            atr_dict[col] = tr_col.rolling(window=period, min_periods=1).mean()
-        return pd.DataFrame(atr_dict)
-    return tr.rolling(window=period, min_periods=1).mean()
+    """Calculate ATR for each column independently."""
+    atr_dict = {}
+    for col in Close.columns:
+        h = High[col]
+        l = Low[col]
+        c = Close[col]
+        hl = h - l
+        hc = (h - c.shift(1)).abs()
+        lc = (l - c.shift(1)).abs()
+        tr = pd.concat([hl, hc, lc], axis=1).max(axis=1)
+        atr_dict[col] = tr.rolling(window=period, min_periods=1).mean()
+    return pd.DataFrame(atr_dict)
+
 
 
 # ── Performance statistics ─────────────────────────────────────────────────────
