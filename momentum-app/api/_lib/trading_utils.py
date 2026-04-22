@@ -3,22 +3,23 @@ import pandas as pd
 
 
 # ── Momentum Factor ────────────────────────────────────────────────────────────
-def MoMFactor(Close, periods=None):
+def MoMFactor(Index):
     """
-    Average cross-sectional rank of momentum across multiple lookback periods.
-    Each period is in months (approximated as 21 trading days).
-    Shift 1 month to avoid short-term reversal (standard practitioner approach).
+    Calculate Momentum Factor
+    
+    Parameters:
+    Index (pd.Series): Time series of prices
+    
+    Returns:
+    pd.Series: Momentum factor values
     """
-    if periods is None:
-        periods = [1, 3, 6, 12]
-    monthly = Close.resample("ME").last()
-    score_list = []
-    for p in periods:
-        ret = monthly.pct_change(p).shift(1)   # shift 1 month
-        score_list.append(ret.rank(axis=1, pct=True))
-    avg = pd.concat(score_list).groupby(level=0).mean()
-    # Reindex to daily, forward-fill so we have a score every trading day
-    return avg.reindex(Close.index).ffill()
+    Index_resampled = Index.copy().resample('D').ffill()
+    series = (12 * Index_resampled.pct_change(30) +
+             4 * Index_resampled.pct_change(91) +
+             2 * Index_resampled.pct_change(182) +
+             Index_resampled.pct_change(365))
+    return series.loc[Index.index]
+
 
 
 # ── RSI ────────────────────────────────────────────────────────────────────────
